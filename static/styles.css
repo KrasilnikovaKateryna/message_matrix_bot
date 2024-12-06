@@ -1,0 +1,173 @@
+/* Общие стили и звездный фон */
+* {
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: url("https://png.pngtree.com/background/20210710/original/pngtree-starry-sky-white-blue-stars-picture-image_985748.jpg") no-repeat center center fixed;
+    background-size: cover;
+    color: #f5f5f5;
+    padding: 10px 0;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: -1;
+}
+
+/* Контейнер для интерфейса */
+.container {
+    width: 90%;
+    max-width: 400px;
+    padding: 15px;
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 2px solid #ffe81f;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/* Заголовок */
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header .logo {
+    width: 100px;
+    margin-bottom: 10px;
+}
+
+/* Стили формы */
+label {
+    display: block;
+    text-align: left;
+    margin: 8px 0 4px;
+    color: #ffe81f;
+    font-weight: bold;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #f5f5f5;
+}
+
+textarea#message {
+    min-height: 60px;
+    max-height: 300px;
+    overflow-y: hidden;
+    resize: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #ddd;
+}
+
+/* Стили кнопки */
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #ffe81f;
+    color: #000;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #ffd60a;
+}
+
+/* Чекбокс для режима 24/7 */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.checkbox-container label {
+    color: #ffe81f;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 20px;
+}
+
+/* Список задач */
+.task-list {
+    margin-top: 15px;
+}
+
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 8px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+}
+
+.task-item span {
+    font-weight: bold;
+    color: #ffe81f;
+}
+
+/* Стили для кнопок управления задачами */
+.task-controls button {
+    padding: 5px 8px;
+    margin-left: 5px;
+    font-size: 14px;
+    background-color: #ff9800;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.task-controls button:hover {
+    background-color: #ffa726;
+}
+
+.task-controls .pause {
+    background-color: #ff9800;
+}
+
+.task-controls .resume {
+    background-color: #4CAF50;
+}
+
+.task-controls .delete {
+    background-color: #f44336;
+}

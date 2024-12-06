@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix Рассылка - Star Wars Theme</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="header">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Star_Wars_Logo.svg" alt="Star Wars Logo" class="logo">
+            <h1>Matrix Рассылка</h1>
+        </div>
+
+        <!-- Форма для добавления новой рассылки -->
+        <form id="schedule-form">
+            <label>Название рассылки:</label>
+            <input type="text" id="name" required>
+
+            <label>Группа:</label>
+            <input type="text" id="group" required placeholder="#комната:matrix.org">
+
+            <label>Интервал (минут):</label>
+            <input type="number" id="interval" required>
+
+            <div class="checkbox-container">
+                <input type="checkbox" id="always_on" onclick="toggleTimeFields()" checked>
+                <label for="always_on">24/7</label>
+            </div>
+
+            <div id="timeFields" style="display: none;">
+                <label>Начало (время):</label>
+                <input type="time" id="start_time">
+
+                <label>Конец (время):</label>
+                <input type="time" id="end_time">
+            </div>
+
+            <label>Сообщение:</label>
+            <textarea id="message" required placeholder="Введите сообщение..."></textarea>
+
+            <button type="button" onclick="addSchedule()">Добавить рассылку</button>
+        </form>
+
+        <div class="task-list" id="task-list">
+            <!-- Здесь будут отображаться добавленные рассылки -->
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Проверяет, соответствует ли строка формату #комната:matrix.org.
+         * @param {string} group - строка для проверки.
+         * @returns {boolean} true, если формат корректный.
+         */
+        function validateGroupFormat(group) {
+            const regex = /^(#[\w\-]+:[\w\-]+\.[\w\-]+|![\w\-]+:[\w\-]+\.[\w\-]+)$/;
+            return regex.test(group);
+        }
+
+        /**
+         * Показывает или скрывает поля для ввода времени.
+         */
+        function toggleTimeFields() {
+            const isAlwaysOn = document.getElementById('always_on').checked;
+            const timeFields = document.getElementById('timeFields');
+            timeFields.style.display = isAlwaysOn ? 'none' : 'block';
+        }
+
+        /**
+         * Добавляет новую рассылку.
+         */
+        function addSchedule() {
+            const group = document.getElementById('group').value;
+
+            // Проверка формата группы
+            if (!validateGroupFormat(group)) {
+                alert("Неверный формат группы! Используйте формат #комната:matrix.org");
+                return; // Прекращаем выполнение функции, если формат неверный
+            }
+
+            const data = {
+                name: document.getElementById('name').value,
+                group: group,
+                interval: document.getElementById('interval').value,
+                always_on: document.getElementById('always_on').checked,
+                start_time: document.getElementById('start_time').value,
+                end_time: document.getElementById('end_time').value,
+                message: document.getElementById('message').value,
+            };
+
+            // Отправляем данные на сервер
+            fetch('/add_schedule', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("Рассылка добавлена!");
+                    loadSchedules();
+                } else {
+                    alert("Ошибка при добавлении рассылки!");
+                }
+            })
+            .catch(error => {
+                console.error("Ошибка:", error);
+                alert("Ошибка при добавлении рассылки!");
+            });
+        }
+
+        /**
+         * Загружает существующие рассылки и отображает их на странице.
+         */
+        async function loadSchedules() {
+            const response = await fetch('/get_schedules');
+            const schedules = await response.json();
+
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = '';
+
+            schedules.forEach(schedule => {
+                const taskItem = document.createElement('div');
+                taskItem.className = 'task-item';
+
+                taskItem.innerHTML = `
+                    <span>${schedule.name} - ${schedule.group}</span>
+                    <div class="task-controls">
+                        <button onclick="toggleSchedule('${schedule.id}')">
+                            ${schedule.active ? 'Пауза' : 'Возобновить'}
+                        </button>
+                        <button onclick="deleteSchedule('${schedule.id}')">Удалить</button>
+                    </div>
+                `;
+
+                taskList.appendChild(taskItem);
+            });
+        }
+
+        /**
+         * Изменяет статус рассылки на активный или паузу.
+         * @param {string} id - идентификатор рассылки.
+         */
+        async function toggleSchedule(id) {
+            await fetch(`/toggle_schedule/${id}`, { method: 'POST' });
+            loadSchedules();
+        }
+
+        /**
+         * Удаляет рассылку.
+         * @param {string} id - идентификатор рассылки.
+         */
+        async function deleteSchedule(id) {
+            await fetch(`/delete_schedule/${id}`, { method: 'DELETE' });
+            loadSchedules();
+        }
+
+        // Автоматическое расширение текстового поля для сообщений
+        const messageField = document.getElementById('message');
+        messageField.addEventListener('input', function () {
+            this.style.height = 'auto'; // Сбрасываем высоту
+            this.style.height = this.scrollHeight + 'px'; // Устанавливаем высоту по содержимому
+        });
+
+        // Загрузка всех рассылок при старте
+        loadSchedules();
+    </script>
+</body>
+</html>
